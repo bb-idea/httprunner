@@ -52,7 +52,7 @@ from httprunner import HttpRunner, Config, Step, RunRequest, RunTestCase
 class {{ class_name }}(HttpRunner):
     {% if parameters and skip %}
     @pytest.mark.parametrize("param", Parameters({{parameters}}))
-    @pytest.mark.skip({{ reason }})
+    @pytest.mark.skip(reason={{ skip }})
     def test_start(self, param):
         super().test_start(param)
 
@@ -62,7 +62,7 @@ class {{ class_name }}(HttpRunner):
         super().test_start(param)
 
     {% elif skip %}
-    @pytest.mark.skip({{ reason }})
+    @pytest.mark.skip(reason={{ skip }})
     def test_start(self):
         super().test_start()
 
@@ -224,7 +224,7 @@ def make_config_skip(config: Dict) -> Text:
             config_chain_style = config["skip"]
         else:
             config_chain_style = '"skip unconditionally"'
-    return config_chain_style
+        return config_chain_style
 
 
 def make_request_chain_style(request: Dict) -> Text:
@@ -438,7 +438,6 @@ def make_testcase(testcase: Dict, dir_path: Text = None) -> Text:
         "config_chain_style": make_config_chain_style(config),
         "parameters": config.get("parameters"),
         "skip": make_config_skip(config),
-        "reason": str(make_config_skip(config)),
         "teststeps_chain_style": [
             make_teststep_chain_style(step) for step in teststeps
         ],
